@@ -1,5 +1,8 @@
-﻿@{
-    Context.Request.Cookies.TryGetValue("Dls-cookie-consent", out string showCookieBanner);
+﻿@inject IConfiguration Configuration
+@{  
+    var cookieBannerAppName = (Configuration["CookieBannerConsent:ApplicationName"]);
+    var cookieBannerCookieName = (Configuration["CookieBannerConsent:CookieName"]);
+    Context.Request.Cookies.TryGetValue(cookieBannerCookieName, out string showCookieBanner);
     var validateCookieBannerViaTempData = TempData["userConsentCookieOption"]; // To avoid inconsistencies. First consent from policy page causes issues.
     var consentViaBannerPostTemp = TempData["consentViaBannerPost"];  // To display confirmation banner (nhsuk-cookie-confirmation-banner-post) after post
     var path = Context.Request.Path; // @(Configuration["CurrentSystemBaseUrl"]
@@ -12,7 +15,7 @@
     <div id="nhsuk-cookie-banner">
         <div class="nhsuk-cookie-banner  nhsuk-u-margin-top-3" id="cookiebanner">
             <div class="nhsuk-width-container ">
-                <h2>Cookies on the Digital Learning Solutions</h2>
+                <h2>Cookies on the @cookieBannerAppName</h2>
                 <p>We've put some small files called cookies on your device to make our site work.</p>
                 <p>We'd also like to use analytics cookies. These send anonymous information about how our site is used to a service called Google Analytics & Hotjar Analytics. We use this information to improve our site.</p>
                 <p>Let us know if this is OK. We'll use a cookie to save your choice. You can <a id="nhsuk-cookie-banner__link" target="_blank" href="@Url.Action( "CookiePolicy","CookieConsent")" tabindex="1">read more about our cookies</a> before you choose.</p>
@@ -46,4 +49,4 @@
     TempData.Remove("consentViaBannerPost"); // This tempdata is used to dispay the banner once after postback, discard after first call.
 }
 
-<script src="@Url.Content("~/js/cookiesbanner.js")" asp-append-version="true"></script>
+<script src="@Url.Content("~/_content/UK.NHS.CookieBanner/lib/cookiebanner/js/cookiesbanner.js")" asp-append-version="true"></script>

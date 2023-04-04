@@ -11,7 +11,6 @@ namespace UK.NHS.CookieBanner.Helpers
             DateTime expiry
         )
         {
-            //var expiry = currentDateTime.AddDays(CookieExpiryDays);
             cookies.Append(
                 cookieName,
                 value,
