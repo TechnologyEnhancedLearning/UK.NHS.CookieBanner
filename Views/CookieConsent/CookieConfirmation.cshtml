@@ -1,6 +1,6 @@
-﻿
+﻿@inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "Digital Learning Solutions - Cookie confirmation";
+    ViewData["Title"] = Configuration["CookieBannerConsent:ApplicationName"] + " - Cookie confirmation";
     ViewData["DoNotDisplayNavBar"] = true;
 }
 

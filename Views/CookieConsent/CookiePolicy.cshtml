@@ -1,7 +1,8 @@
 ﻿@using UK.NHS.CookieBanner.ViewModels
+@inject IConfiguration Configuration
 @model CookieConsentViewModel;
 @{
-    ViewData["Title"] = "Digital Learning Solutions - Cookie policy";
+    ViewData["Title"] = Configuration["CookieBannerConsent:ApplicationName"] + " - Cookie policy";
     ViewData["DoNotDisplayNavBar"] = true;
 }
 <form method="post" asp-action="CookiePolicy">
