@@ -3,7 +3,7 @@
 @model CookieConsentViewModel;
 @{
     ViewData["Title"] = Configuration["CookieBannerConsent:ApplicationName"] + " - Cookie policy";
-    ViewData["DoNotDisplayNavBar"] = true ;
+    ViewData["DoNotDisplayNavBar"] = true;
 }
 <form method="post" asp-action="CookiePolicy">
     @*<input type="hidden" asp-for="UserConsent" />*@
