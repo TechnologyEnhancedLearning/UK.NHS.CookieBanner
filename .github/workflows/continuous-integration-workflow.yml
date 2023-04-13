@@ -1,8 +1,8 @@
 name: Cookie Banner Continuous Integration
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 jobs:
   build:
       env:
