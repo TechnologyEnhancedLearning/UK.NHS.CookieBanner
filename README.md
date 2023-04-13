@@ -1,6 +1,6 @@
 # UK.NHS.CookieBanner
 
-#### Update _Layout.cshtml file
+### Update _Layout.cshtml file
 
 Add following configuration in _Layout.cshtml
 Need to add in Header section nhsuk.css if it doesnt exist
@@ -16,7 +16,7 @@ Need to add in Header section nhsuk.css if it doesnt exist
 ```bash
  @RenderSection("NavBreadcrumbs", false)
 ```
-#### Update Configuration file
+### Update Configuration file
 
 appsettings.json
 
@@ -27,7 +27,7 @@ appsettings.json
     "ExpiryDays": "365"
   }
 ```
-  // Get cookie policy content from SQL based source
+ #### Get cookie policy content from SQL based source
   
   ```bash
   "CookiePolicy": {
@@ -36,7 +36,7 @@ appsettings.json
   }
   ```
 or 
-   // Get cookie policy content from API's
+ ####  Get cookie policy content from API's
    ```bash
   "CookiePolicy": {
     "ApiUrl": "",
