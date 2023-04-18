@@ -36,6 +36,7 @@ jobs:
             echo "Minor: ${{ steps.gitversion.outputs.minor }}"
             echo "Patch: ${{ steps.gitversion.outputs.patch }}"
             echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+            echo "KEY: ${{ secrets.NUGETAPIKEY  }}"
             
         - name: Add Azure artifact
           run: dotnet nuget add source 'https://pkgs.dev.azure.com/e-LfH/_packaging/LearningHubFeed/nuget/v3/index.json' --name 'LearningHubFeed'  --username 'kevin.whittaker' --password ${{ secrets.AZUREDEVOPSKEY }} --store-password-in-clear-text
@@ -47,4 +48,4 @@ jobs:
           run: dotnet pack UK.NHS.CookieBanner.sln --configuration release -o:package /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2  }}
 
         - name: Push generated package to GitHub registry         
-          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json  --api-key ${{ secrets.NUGETAPIKEY }}
+          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json  --api-key ${{ secrets.GITHUB_TOKEN }  --api-key ${{ secrets.NUGETAPIKEY }}
