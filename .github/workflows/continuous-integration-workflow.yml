@@ -1,8 +1,5 @@
 name: Cookie Banner Continuous Integration
-on:
-  push:
-    tags:
-      - '*'
+on: [push]
 jobs:
   build:
       env:
@@ -48,12 +45,6 @@ jobs:
 
         - name: Package nuget        
           run: dotnet pack UK.NHS.CookieBanner.sln --configuration release -o:package /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2  }}
-        
-        - name: Push generated package to Azure feed
-          run: dotnet nuget push ./package/*.nupkg  --source https://pkgs.dev.azure.com/e-LfH/_packaging/LearningHubFeed/nuget/v3/index.json   --api-key ${{ secrets.AZUREDEVOPSKEY }}
-        
-        - name: Push generated package to GitHub registry         
-          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json   --api-key ${{ secrets.NUGETAPIKEY }}
 
-            
-     
+        - name: Push generated package to GitHub registry         
+          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json  --api-key ${{ secrets.NUGETAPIKEY }}
