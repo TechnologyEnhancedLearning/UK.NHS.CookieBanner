@@ -31,7 +31,7 @@ appsettings.json
   
   ```bash
   "CookiePolicy": {
-    "ConnectionStringName": "", // Connection name secified in "ConnectionStrings"
+    "ConnectionStringName": "", // Connection name specified in "ConnectionStrings"
     "CookiePolicySQL": ""
   }
   ```
@@ -41,5 +41,6 @@ or
   "CookiePolicy": {
     "ApiUrl": "",
     "CookiePolicyRequestURI": ""
+    "ClientIdentityKey": ""
   }
 ```
