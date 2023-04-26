@@ -9,30 +9,34 @@ namespace UK.NHS.CookieBanner.Services
         /// </summary>
         /// <param name="id">Id.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        Task<string> LatestVersionAsync(int id);
+        Task<CookiePolicy> LatestVersionAsync(string request);
     }
     public class CookiePolicyService : ICookiePolicyService
     {
-        public async Task<string> LatestVersionAsync(int id)
+        private readonly IGenericApiHttpClient genericApiHttpClient;
+        public CookiePolicyService(IGenericApiHttpClient genericApiHttpClient)
         {
-            string viewmodel = string.Empty;
+            this.genericApiHttpClient = genericApiHttpClient;
+        }
 
-            //var client = await GetClientAsync();
+        public async Task<CookiePolicy> LatestVersionAsync(string request)
+        {
+            CookiePolicy viewmodel = new();
 
-            //var request = $"TermsAndConditions/LatestVersion/{tenantId}";
-            //var response = await client.GetAsync(request).ConfigureAwait(false);
+            var client = await genericApiHttpClient.GetClientAsync();            
+            var response = await client.GetAsync(request).ConfigureAwait(false);
 
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    var result = response.Content.ReadAsStringAsync().Result;
-            //    viewmodel = JsonConvert.DeserializeObject<string>(result);
-            //}
-            //else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized
-            //            ||
-            //         response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            //{
-            //    throw new Exception("AccessDenied");
-            //}
+            if (response.IsSuccessStatusCode)
+            {
+                var result = response.Content.ReadAsStringAsync().Result;
+                viewmodel = JsonConvert.DeserializeObject<CookiePolicy>(result);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized
+                        ||
+                     response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new Exception("AccessDenied");
+            }
 
             return viewmodel;
         }

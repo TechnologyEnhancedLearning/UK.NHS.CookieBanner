@@ -4,6 +4,7 @@ using System.Data;
 using UK.NHS.CookieBanner.DataServices;
 using UK.NHS.CookieBanner.Extensions;
 using UK.NHS.CookieBanner.Helpers;
+using UK.NHS.CookieBanner.Services;
 using UK.NHS.CookieBanner.ViewModels;
 
 namespace UK.NHS.CookieBanner.Controllers
@@ -15,8 +16,10 @@ namespace UK.NHS.CookieBanner.Controllers
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
         private readonly IDbConnection connection;
+        private readonly ICookiePolicyService cookiePolicyService;
+        private readonly IGenericApiHttpClient genericApiHttpClient;
 
-        public CookieConsentController(IConfiguration configuration)
+        public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService, IGenericApiHttpClient genericApiHttpClient)
         {
             this.configuration = configuration;
             CookieBannerConsentCookieName = configuration.GetCookieBannerConsentCookieName();
@@ -26,29 +29,19 @@ namespace UK.NHS.CookieBanner.Controllers
             string? cookieBannerConnectionString = configuration.GetSection("ConnectionStrings")
                 .GetChildren().FirstOrDefault(config => config.Key == cookieBannerCSName)?.Value;
             connection = new SqlConnection(cookieBannerConnectionString);
-            configDataService = new ConfigDataService(connection);
-            this.configDataService = configDataService;
+            this.configDataService = new ConfigDataService(connection);            
+            this.cookiePolicyService = cookiePolicyService;
+            this.genericApiHttpClient = genericApiHttpClient;   
         }
 
-        public IActionResult CookiePolicy()
+        public async Task<IActionResult> CookiePolicy()
         {
-            string cookiePolicyContent = string.Empty;
-            string policyLastUpdatedDate = string.Empty;
-
-            if (connection != null)
+            var cookiePolicyDetails = await GetCookiePolicyContentDetails();
+            var model = new CookieConsentViewModel(cookiePolicyDetails.Details)
             {
-                string policySQL = configuration.GetPolicySQL();
-                cookiePolicyContent = configDataService.GetData(policySQL);
-                policyLastUpdatedDate = configDataService.GetConfigValue(ConfigDataService.CookiePolicyUpdatedDate);
-                cookiePolicyContent ??= "Cookie policy content is null";
-            }
-            else
-            {
-                cookiePolicyContent = "Please check the connection string in configuration file";
-            }
+                PolicyUpdatedDate = cookiePolicyDetails.AmendDate
+            };
 
-            var model = new CookieConsentViewModel(cookiePolicyContent);
-            model.PolicyUpdatedDate = policyLastUpdatedDate;
             if (Request != null)
             {
                 if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
@@ -58,6 +51,30 @@ namespace UK.NHS.CookieBanner.Controllers
             }
 
             return View(model);
+        }
+
+        private async Task<CookiePolicy> GetCookiePolicyContentDetails()
+        {
+            var cookiePolicy = new CookiePolicy();
+            string request = configuration.GetCookiePolicyRequestURI();
+            
+            if (!string.IsNullOrEmpty(connection.Database))
+            {
+                string policySQL = configuration.GetPolicySQL();
+                cookiePolicy.Details = configDataService.GetData(policySQL);
+                cookiePolicy.Details ??= "Cookie policy content is null";
+                cookiePolicy.AmendDate = configDataService.GetConfigValue(ConfigDataService.CookiePolicyUpdatedDate);                
+            }
+            else if(!string.IsNullOrEmpty(request))
+            {
+                cookiePolicy = await cookiePolicyService.LatestVersionAsync(request);
+            }
+            else
+            {
+                cookiePolicy.Details = "Please check the connection string in configuration file";
+            }
+
+            return cookiePolicy;
         }
 
         [HttpPost]

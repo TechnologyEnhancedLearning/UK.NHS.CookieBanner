@@ -1,7 +1,11 @@
+using UK.NHS.CookieBanner.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<IGenericApiHttpClient, GenericApiHttpClient>();
+builder.Services.AddScoped<ICookiePolicyService, CookiePolicyService>();
 
 var app = builder.Build();
 

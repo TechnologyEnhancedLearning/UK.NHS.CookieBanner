@@ -1,4 +1,8 @@
-﻿namespace UK.NHS.CookieBanner.Services
+﻿using Microsoft.Extensions.Options;
+using UK.NHS.CookieBanner.DataServices;
+using static Dapper.SqlMapper;
+
+namespace UK.NHS.CookieBanner.Services
 {
     public interface IGenericApiHttpClient
     {
@@ -6,6 +10,8 @@
     }
     public class GenericApiHttpClient : BaseHttpClient, IGenericApiHttpClient
     {
-        public override string ApiUrl => "B";//  this.WebSettings.UserApiUrl;
+        public GenericApiHttpClient(IConfiguration configuration, HttpClient client) : base(configuration,client)
+        {
+        }       
     }
 }
