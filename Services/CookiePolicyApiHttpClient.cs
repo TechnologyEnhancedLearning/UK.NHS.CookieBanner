@@ -4,14 +4,14 @@ using static Dapper.SqlMapper;
 
 namespace UK.NHS.CookieBanner.Services
 {
-    public interface IGenericApiHttpClient
+    public interface ICookiePolicyApiHttpClient
     {
         HttpClient GetClient();
         Task<HttpClient> GetClientAsync();
     }
-    public class GenericApiHttpClient : BaseHttpClient, IGenericApiHttpClient
+    public class CookiePolicyApiHttpClient : BaseHttpClient, ICookiePolicyApiHttpClient
     {
-        public GenericApiHttpClient(IConfiguration configuration, HttpClient client) : base(configuration,client)
+        public CookiePolicyApiHttpClient(IConfiguration configuration, HttpClient client) : base(configuration,client)
         {
         }       
     }

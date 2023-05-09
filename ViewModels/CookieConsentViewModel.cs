@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Html;
+using UK.NHS.CookieBanner.Services;
 
 namespace UK.NHS.CookieBanner.ViewModels
 {
@@ -8,14 +9,20 @@ namespace UK.NHS.CookieBanner.ViewModels
         private string? userConsent;
 
         public HtmlString? CookiePolicyContent { get; }
-
+        public string? ErrorMessage { get; }
         public CookieConsentViewModel()
-        {
+        {            
         }
-        public CookieConsentViewModel(string cookiePolicyContent)
+        public CookieConsentViewModel(string? errorMessage)
         {
-            CookiePolicyContent = new HtmlString(cookiePolicyContent);
+            ErrorMessage = errorMessage;
         }
+        public CookieConsentViewModel(CookiePolicy cookiePolicyContent)
+        {
+            CookiePolicyContent = new HtmlString(cookiePolicyContent.Details);
+            PolicyUpdatedDate = cookiePolicyContent.AmendDate;
+        }
+       
         public string? PolicyUpdatedDate { get; set; }
         public string? PolicyUpdatedDateAsShort
         {

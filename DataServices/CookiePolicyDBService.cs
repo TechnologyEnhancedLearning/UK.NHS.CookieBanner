@@ -10,12 +10,12 @@
 
     public class CookiePolicyDBService:ICookiePolicyService
     {
-        private readonly IDbConnection connection;
-        private readonly IConfiguration configuration;
+        private readonly IDbConnection? connection;
+        private readonly IConfiguration? configuration;
 
-        //public DbService()
-        //{
-        //}
+        public CookiePolicyDBService()
+        {
+        }
         public CookiePolicyDBService(IDbConnection connection, IConfiguration configuration)
         {
             this.connection = connection;
@@ -23,10 +23,7 @@
         }
         private readonly string? _connectionString;
 
-        //public DbService(string connectionString)
-        //{
-        //    _connectionString = connectionString;
-        //}
+     
         public CookiePolicy GetCookiePolicyDetails()
         {
             string policySql = configuration.GetPolicySQL();

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Reflection;
 using UK.NHS.CookieBanner.DataServices;
 using UK.NHS.CookieBanner.Extensions;
 using UK.NHS.CookieBanner.Helpers;
@@ -11,70 +13,51 @@ namespace UK.NHS.CookieBanner.Controllers
 {
     public class CookieConsentController : Controller
     {
-        private readonly IConfigDataService configDataService;
         private readonly IConfiguration configuration;
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
-        private readonly IDbConnection connection;
-        private readonly ICookiePolicyService cookiePolicyService;       
+        private readonly ICookiePolicyService cookiePolicyService;
 
         public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService)
         {
             this.configuration = configuration;
+            this.cookiePolicyService = cookiePolicyService;
             CookieBannerConsentCookieName = configuration.GetCookieBannerConsentCookieName();
             CookieBannerConsentCookieExpiryDays = configuration.GetCookieBannerConsentExpiryDays();
 
             string cookieBannerCSName = configuration.GetCookiePolicyConnectionStringName();
-            string? cookieBannerConnectionString = configuration.GetSection("ConnectionStrings")
-                .GetChildren().FirstOrDefault(config => config.Key == cookieBannerCSName)?.Value;
-            connection = new SqlConnection(cookieBannerConnectionString);
-            this.configDataService = new ConfigDataService(connection);
-            this.cookiePolicyService = cookiePolicyService;
+            if (!string.IsNullOrEmpty(cookieBannerCSName))
+            {
+                string? cookieBannerConnectionString = configuration.GetSection("ConnectionStrings")
+                    .GetChildren().FirstOrDefault(config => config.Key == cookieBannerCSName)?.Value;
+
+                this.cookiePolicyService = new CookiePolicyDBService(new SqlConnection(cookieBannerConnectionString), configuration);
+            }
         }
 
         public IActionResult CookiePolicy()
         {
-            var cookiePolicyDetails = cookiePolicyService.GetCookiePolicyDetails();
-
-            var model = new CookieConsentViewModel(cookiePolicyDetails.Details)
+            var model = new CookieConsentViewModel();
+            try
             {
-                PolicyUpdatedDate = cookiePolicyDetails.AmendDate
-            };
+                var cookiePolicyDetails = cookiePolicyService.GetCookiePolicyDetails();
+                model = new CookieConsentViewModel(cookiePolicyDetails);
 
-            if (Request != null)
+                if (Request != null)
+                {
+                    if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
+                        model.UserConsent = "true";
+                    else if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "false"))
+                        model.UserConsent = "false";
+                }
+            }
+            catch (Exception ex)
             {
-                if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
-                    model.UserConsent = "true";
-                else if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "false"))
-                    model.UserConsent = "false";
+                model = new CookieConsentViewModel(ex?.Message?.ToString() + "\n" + ex?.InnerException?.Message.ToString());
             }
 
             return View(model);
         }
-
-        //private async Task<CookiePolicy> GetCookiePolicyContentDetails()
-        //{
-        //    var cookiePolicy = new CookiePolicy();
-        //    string request = configuration.GetCookiePolicyRequestURI();
-
-        //    if (!string.IsNullOrEmpty(connection.Database))
-        //    {
-        //        string policySQL = configuration.GetPolicySQL();
-        //        cookiePolicy.Details = configDataService.GetData(policySQL);
-        //        cookiePolicy.Details ??= "Cookie policy content is null";
-        //        cookiePolicy.AmendDate = configDataService.GetConfigValue(configuration.GetPolicyUpdateDateSQL());                
-        //    }
-        //    else if(!string.IsNullOrEmpty(request))
-        //    {
-        //        cookiePolicy = await cookiePolicyService.LatestVersionAsync(request);
-        //    }
-        //    else
-        //    {
-        //        cookiePolicy.Details = "Please check the connection string in configuration file";
-        //    }
-
-        //    return cookiePolicy;
-        //}
 
         [HttpPost]
         public IActionResult CookiePolicy(CookieConsentViewModel model)
