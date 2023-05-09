@@ -16,10 +16,9 @@ namespace UK.NHS.CookieBanner.Controllers
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
         private readonly IDbConnection connection;
-        private readonly ICookiePolicyService cookiePolicyService;
-        private readonly IGenericApiHttpClient genericApiHttpClient;
+        private readonly ICookiePolicyService cookiePolicyService;       
 
-        public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService, IGenericApiHttpClient genericApiHttpClient)
+        public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService)
         {
             this.configuration = configuration;
             CookieBannerConsentCookieName = configuration.GetCookieBannerConsentCookieName();
@@ -29,14 +28,14 @@ namespace UK.NHS.CookieBanner.Controllers
             string? cookieBannerConnectionString = configuration.GetSection("ConnectionStrings")
                 .GetChildren().FirstOrDefault(config => config.Key == cookieBannerCSName)?.Value;
             connection = new SqlConnection(cookieBannerConnectionString);
-            this.configDataService = new ConfigDataService(connection);            
+            this.configDataService = new ConfigDataService(connection);
             this.cookiePolicyService = cookiePolicyService;
-            this.genericApiHttpClient = genericApiHttpClient;   
         }
 
-        public async Task<IActionResult> CookiePolicy()
+        public IActionResult CookiePolicy()
         {
-            var cookiePolicyDetails = await GetCookiePolicyContentDetails();
+            var cookiePolicyDetails = cookiePolicyService.GetCookiePolicyDetails();
+
             var model = new CookieConsentViewModel(cookiePolicyDetails.Details)
             {
                 PolicyUpdatedDate = cookiePolicyDetails.AmendDate
@@ -53,29 +52,29 @@ namespace UK.NHS.CookieBanner.Controllers
             return View(model);
         }
 
-        private async Task<CookiePolicy> GetCookiePolicyContentDetails()
-        {
-            var cookiePolicy = new CookiePolicy();
-            string request = configuration.GetCookiePolicyRequestURI();
-            
-            if (!string.IsNullOrEmpty(connection.Database))
-            {
-                string policySQL = configuration.GetPolicySQL();
-                cookiePolicy.Details = configDataService.GetData(policySQL);
-                cookiePolicy.Details ??= "Cookie policy content is null";
-                cookiePolicy.AmendDate = configDataService.GetConfigValue(ConfigDataService.CookiePolicyUpdatedDate);                
-            }
-            else if(!string.IsNullOrEmpty(request))
-            {
-                cookiePolicy = await cookiePolicyService.LatestVersionAsync(request);
-            }
-            else
-            {
-                cookiePolicy.Details = "Please check the connection string in configuration file";
-            }
+        //private async Task<CookiePolicy> GetCookiePolicyContentDetails()
+        //{
+        //    var cookiePolicy = new CookiePolicy();
+        //    string request = configuration.GetCookiePolicyRequestURI();
 
-            return cookiePolicy;
-        }
+        //    if (!string.IsNullOrEmpty(connection.Database))
+        //    {
+        //        string policySQL = configuration.GetPolicySQL();
+        //        cookiePolicy.Details = configDataService.GetData(policySQL);
+        //        cookiePolicy.Details ??= "Cookie policy content is null";
+        //        cookiePolicy.AmendDate = configDataService.GetConfigValue(configuration.GetPolicyUpdateDateSQL());                
+        //    }
+        //    else if(!string.IsNullOrEmpty(request))
+        //    {
+        //        cookiePolicy = await cookiePolicyService.LatestVersionAsync(request);
+        //    }
+        //    else
+        //    {
+        //        cookiePolicy.Details = "Please check the connection string in configuration file";
+        //    }
+
+        //    return cookiePolicy;
+        //}
 
         [HttpPost]
         public IActionResult CookiePolicy(CookieConsentViewModel model)

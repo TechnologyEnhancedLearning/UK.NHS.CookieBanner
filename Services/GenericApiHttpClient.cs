@@ -6,6 +6,7 @@ namespace UK.NHS.CookieBanner.Services
 {
     public interface IGenericApiHttpClient
     {
+        HttpClient GetClient();
         Task<HttpClient> GetClientAsync();
     }
     public class GenericApiHttpClient : BaseHttpClient, IGenericApiHttpClient

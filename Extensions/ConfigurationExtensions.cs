@@ -7,6 +7,7 @@
 
         private const string CookiePolicyConnectionStringName = "CookiePolicy:ConnectionStringName";
         private const string CookiePolicySQL = "CookiePolicy:CookiePolicySQL";
+        private const string CookiePolicyUpdatedDateSQL = "CookiePolicy:UpdatedDateSQL";
 
         private const string CookiePolicyAPIUrl = "CookiePolicy:ApiUrl";
         private const string CookiePolicyAPIClientIdentityKey = "CookiePolicy:ClientIdentityKey";
@@ -29,6 +30,10 @@
         public static string GetPolicySQL(this IConfiguration config)
         {
             return config[CookiePolicySQL];
+        }
+        public static string GetPolicyUpdateDateSQL(this IConfiguration config)
+        {
+            return config[CookiePolicyUpdatedDateSQL];
         }
         public static string GetCookiePolicyAPIUrl(this IConfiguration config)
         {

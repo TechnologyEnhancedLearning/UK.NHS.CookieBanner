@@ -20,6 +20,11 @@ namespace UK.NHS.CookieBanner.Services
             this.Initialise();
         }
 
+        public HttpClient GetClient()
+        {
+            return this.httpClient;
+        }
+
         public async Task<HttpClient> GetClientAsync()
         {           
             return this.httpClient;

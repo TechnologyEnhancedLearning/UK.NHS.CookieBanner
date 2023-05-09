@@ -2,7 +2,10 @@
 {
     public class CookiePolicy
     {
-        public string? Details { get; set; }
-        public string? AmendDate { get; set; }
+        private string details = string.Empty;
+        private string amendDate = string.Empty;
+
+        public string Details { get => details; set => details = value; }
+        public string AmendDate { get => amendDate; set => amendDate = value; }
     }
 }

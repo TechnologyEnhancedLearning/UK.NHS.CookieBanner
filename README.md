@@ -40,6 +40,7 @@ builder.Services.AddScoped<ICookiePolicyService, CookiePolicyService>();
   "CookiePolicy": {
     "ConnectionStringName": "", // Connection name specified in "ConnectionStrings"
     "CookiePolicySQL": ""
+    "UpdatedDateSQL": ""
   }
   ```
 or 
