@@ -50,10 +50,10 @@ jobs:
           run: dotnet pack UK.NHS.CookieBanner.sln --configuration release -o:package /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2  }}
         
         - name: Push generated package to Azure feed
-          run: dotnet nuget push ./package/*.nupkg  --source https://pkgs.dev.azure.com/e-LfH/_packaging/LearningHubFeed/nuget/v3/index.json   --api-key ${{ secrets.AZUREDEVOPSKEY }} --force
+          run: dotnet nuget push ./package/*.nupkg  --source https://pkgs.dev.azure.com/e-LfH/_packaging/LearningHubFeed/nuget/v3/index.json   --api-key ${{ secrets.AZUREDEVOPSKEY }} --replace
         
         - name: Push generated package to GitHub registry         
-          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json   --api-key ${{ secrets.GITHUB_TOKEN }} --force
+          run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/TechnologyEnhancedLearning/index.json   --api-key ${{ secrets.GITHUB_TOKEN }} --replace
 
             
      
