@@ -14,9 +14,10 @@ namespace UK.NHS.CookieBanner.Controllers
     public class CookieConsentController : Controller
     {
         private readonly IConfiguration configuration;
+        private readonly ICookiePolicyService cookiePolicyService;
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
-        private readonly ICookiePolicyService cookiePolicyService;
+        private string[] CookieBannerDeleteConsentCookieNames;
 
         public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService)
         {
@@ -24,6 +25,7 @@ namespace UK.NHS.CookieBanner.Controllers
             this.cookiePolicyService = cookiePolicyService;
             CookieBannerConsentCookieName = configuration.GetCookieBannerConsentCookieName();
             CookieBannerConsentCookieExpiryDays = configuration.GetCookieBannerConsentExpiryDays();
+            CookieBannerDeleteConsentCookieNames = configuration.GetCookieBannerDeleteCookieNames();
 
             string cookieBannerCSName = configuration.GetCookiePolicyConnectionStringName();
             if (!string.IsNullOrEmpty(cookieBannerCSName))
@@ -89,7 +91,7 @@ namespace UK.NHS.CookieBanner.Controllers
             return RedirectToAction(actionName, controllerName);
         }
 
-        public void ConfirmCookieConsent(string consent, bool setTempDataConsentViaBannerPost = false)
+        public IActionResult ConfirmCookieConsent(string consent, bool setTempDataConsentViaBannerPost = false)
         {
             if (Response != null)
             {
@@ -98,12 +100,34 @@ namespace UK.NHS.CookieBanner.Controllers
                         DateTime.UtcNow.AddDays(CookieBannerConsentCookieExpiryDays));
 
                 else if (consent == "false")
+                {
                     Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent,
                         DateTime.UtcNow.AddDays(CookieBannerConsentCookieExpiryDays));
+                    RemoveCookies();
+                }
 
                 TempData["userConsentCookieOption"] = consent;
 
                 if (setTempDataConsentViaBannerPost) TempData["consentViaBannerPost"] = consent; // Need this tempdata to display the confirmation banner
+            }
+            return Json("OK");
+        }
+
+        private void RemoveCookies()
+        {
+            // Get the domain name from the request URL without protocol or "www" prefix
+            string domainName = HttpContext.Request.Host.Host;
+            if (domainName.StartsWith("www"))
+                domainName = domainName.Substring(3);
+
+            foreach (var removeCookieName in CookieBannerDeleteConsentCookieNames)
+            {
+                // List and delete all cookies from config
+                var cookies = Request.Cookies.Where(c => c.Key.StartsWith(removeCookieName)).ToList();
+                foreach (var cookie in cookies)
+                {
+                    Response.Cookies.Delete(cookie.Key, new CookieOptions { Domain = domainName });
+                }
             }
         }
     }

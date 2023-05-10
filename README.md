@@ -30,10 +30,18 @@ Need to add in Header section nhsuk.css if it doesnt exist
 
 Program.cs
 
+ #### SQL based source
 ```bash
-builder.Services.AddHttpClient<IGenericApiHttpClient, GenericApiHttpClient>();
-builder.Services.AddScoped<ICookiePolicyService, CookiePolicyService>();
+builder.Services.AddScoped<ICookiePolicyService, CookiePolicyDBService>();
 ```
+
+ #### API's
+```bash
+builder.Services.AddHttpClient<ICookiePolicyApiHttpClient, CookiePolicyApiHttpClient>();
+builder.Services.AddScoped<ICookiePolicyService, CookiePolicyAPIService>();
+```
+
+
  #### Get cookie policy content from SQL based source
   
   ```bash

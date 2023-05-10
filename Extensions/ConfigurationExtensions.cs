@@ -4,6 +4,7 @@
     {
         private const string CookieBannerConsentCookieName = "CookieBannerConsent:CookieName";
         private const string CookieBannerConsentExpiryDays = "CookieBannerConsent:ExpiryDays";
+        private const string CookieBannerDeleteCookieNames = "CookieBannerConsent:DeleteCookieNamesPrefix";
 
         private const string CookiePolicyConnectionStringName = "CookiePolicy:ConnectionStringName";
         private const string CookiePolicySQL = "CookiePolicy:CookiePolicySQL";
@@ -17,11 +18,15 @@
         {
             return config[CookiePolicyConnectionStringName];
         }
-        public static string GetCookieBannerConsentCookieName(this IConfiguration config)
+        public static string GetCookieBannerConsentCookieName (this IConfiguration config)
         {
             return config[CookieBannerConsentCookieName];
         }
-
+        public static string[] GetCookieBannerDeleteCookieNames(this IConfiguration config)
+        {
+            var deleteCookieNames = config.GetSection(CookieBannerDeleteCookieNames);
+            return deleteCookieNames.GetChildren().Select(x => x.Value).ToArray();
+        }
         public static int GetCookieBannerConsentExpiryDays(this IConfiguration config)
         {
             int.TryParse(config[CookieBannerConsentExpiryDays], out int expiryDays);
