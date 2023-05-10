@@ -1,8 +1,22 @@
 # UK.NHS.CookieBanner
 
+# Cookie Banner NuGet Package for .NET Core
+This NuGet package provides an easy-to-use cookie banner for .NET Core web applications. The cookie banner allows you to comply with the EU Law and the GDPR by informing users about the use of cookies on your website and giving them the option to accept or decline cookies.
+
+ It is designed to work with API calls, SQL server, and custom classes.
+
+# Installation
+You can install the package via NuGet Package Manager or by running the following command in the Package Manager Console:
+
+```bash
+Install-Package UK.NHS.CookieBanner
+````
+
+## Usage
+
 ### Update _Layout.cshtml file
 
-Add following configuration in _Layout.cshtml
+In your _Layout.cshtml file (or any other view where you want to display the cookie banner), add the following code
 Need to add in Header section nhsuk.css if it doesnt exist
 
 ```bash
@@ -17,18 +31,14 @@ Need to add in Header section nhsuk.css if it doesnt exist
  @RenderSection("NavBreadcrumbs", false)
 ```
 
-### Update _Layout.cshtml file
-
-Add following configuration in _Layout.cshtml
-Need to add in Header section nhsuk.css if it doesnt exist
-
 ```bash
 <link rel="stylesheet" href="~/_content/UK.NHS.CookieBanner/lib/cookiebanner/css/nhsuk.css" asp-append-version="true" />
 ```
 
 ### Update Program.cs file
-
 Program.cs
+
+There is a possibility of utilising various sources to populate the cookie policy content through different means, including calling APIs, using a SQL server, or implementing a custom approach.
 
  #### SQL based source
 ```bash
@@ -60,3 +70,10 @@ or
     "ClientIdentityKey": ""
   }
 ```
+
+## Contributions
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+ 
