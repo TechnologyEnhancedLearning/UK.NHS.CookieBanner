@@ -14,12 +14,12 @@ namespace UK.NHS.CookieBanner.Controllers
     public class CookieConsentController : Controller
     {
         private readonly IConfiguration configuration;
-        private readonly ICookiePolicyService cookiePolicyService;
+        private readonly ICookiePolicyService? cookiePolicyService;
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
         private string[] CookieBannerDeleteConsentCookieNames;
 
-        public CookieConsentController(IConfiguration configuration, ICookiePolicyService cookiePolicyService)
+        public CookieConsentController(IConfiguration configuration, ICookiePolicyService? cookiePolicyService = null)
         {
             this.configuration = configuration;
             this.cookiePolicyService = cookiePolicyService;
@@ -42,15 +42,23 @@ namespace UK.NHS.CookieBanner.Controllers
             var model = new CookieConsentViewModel();
             try
             {
-                var cookiePolicyDetails = cookiePolicyService.GetCookiePolicyDetails();
-                model = new CookieConsentViewModel(cookiePolicyDetails);
-
-                if (Request != null)
+                if (cookiePolicyService != null)
                 {
-                    if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
-                        model.UserConsent = "true";
-                    else if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "false"))
-                        model.UserConsent = "false";
+                    var cookiePolicyDetails = cookiePolicyService.GetCookiePolicyDetails();
+
+                    model = new CookieConsentViewModel(cookiePolicyDetails);
+
+                    if (Request != null)
+                    {
+                        if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
+                            model.UserConsent = "true";
+                        else if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "false"))
+                            model.UserConsent = "false";
+                    }
+                }
+                else
+                {
+                    model = new CookieConsentViewModel("Cookie Policy Implementation Not Found");
                 }
             }
             catch (Exception ex)
@@ -64,12 +72,13 @@ namespace UK.NHS.CookieBanner.Controllers
         [HttpPost]
         public IActionResult CookiePolicy(CookieConsentViewModel model)
         {
-            string consent = model.UserConsent?.ToString();
+            string? consent = model.UserConsent?.ToString();
             if (!string.IsNullOrEmpty(consent))
                 ConfirmCookieConsent(consent);
 
             return View("CookieConfirmation");
         }
+
         public IActionResult CookieConsentConfirmation(string consent, string path)
         {
             if (!string.IsNullOrEmpty(consent))
@@ -95,18 +104,22 @@ namespace UK.NHS.CookieBanner.Controllers
         {
             if (Response != null)
             {
+                string domainName = HttpContext.Request.Host.Host;
+                if (domainName.StartsWith("www"))
+                    domainName = domainName.Substring(3);
+
                 if (consent == "true")
-                    Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent,
+                    Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent, domainName,
                         DateTime.UtcNow.AddDays(CookieBannerConsentCookieExpiryDays));
 
                 else if (consent == "false")
                 {
-                    Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent,
+                    Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent, domainName,
                         DateTime.UtcNow.AddDays(CookieBannerConsentCookieExpiryDays));
                     RemoveCookies();
                 }
-
-                TempData["userConsentCookieOption"] = consent;
+            
+                TempData["ObtainUserConsentToTrackPriorToPageLoad"] = consent;
 
                 if (setTempDataConsentViaBannerPost) TempData["consentViaBannerPost"] = consent; // Need this tempdata to display the confirmation banner
             }
@@ -129,6 +142,6 @@ namespace UK.NHS.CookieBanner.Controllers
                     Response.Cookies.Delete(cookie.Key, new CookieOptions { Domain = domainName });
                 }
             }
-        }
+        }       
     }
 }

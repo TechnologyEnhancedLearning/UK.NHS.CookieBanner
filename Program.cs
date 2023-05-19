@@ -5,10 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<ICookiePolicyService, CookiePolicyDBService>();
+//builder.Services.AddScoped<ICookiePolicyService, CookiePolicyDBService>();
 
-builder.Services.AddHttpClient<ICookiePolicyApiHttpClient, CookiePolicyApiHttpClient>();
-builder.Services.AddScoped<ICookiePolicyService, CookiePolicyAPIService>();
+//builder.Services.AddHttpClient<ICookiePolicyApiHttpClient, CookiePolicyApiHttpClient>();
+//builder.Services.AddScoped<ICookiePolicyService, CookiePolicyAPIService>();
 
 var app = builder.Build();
 
@@ -29,6 +29,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=CookieConsent}/{action=CookiePolicy}/{id?}");
+    pattern: "{controller=CookieConsent}/{action=CookiePolicyDetails}/{id?}");
 
 app.Run();

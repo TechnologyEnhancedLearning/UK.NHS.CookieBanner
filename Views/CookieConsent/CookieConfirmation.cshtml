@@ -1,5 +1,8 @@
 ﻿@inject IConfiguration Configuration
 @{
+    Layout = (string.IsNullOrEmpty(TempData["Layout"]?.ToString()) ? "_Layout" : TempData["Layout"].ToString());
+    var policyControllerName = (string.IsNullOrEmpty(Configuration["CookiePolicy:ControllerName"]) ? "CookieConsent" : Configuration["CookiePolicy:ControllerName"]);
+    var policyActionName = (string.IsNullOrEmpty(Configuration["CookiePolicy:ActionName"]) ? "CookiePolicy" : Configuration["CookiePolicy:ActionName"]);
     ViewData["Title"] = Configuration["CookieBannerConsent:ApplicationName"] + " - Cookie confirmation";
     ViewData["DoNotDisplayNavBar"] = true;
 }
@@ -10,8 +13,8 @@
             <ol class="nhsuk-breadcrumb__list">
                 <li class="nhsuk-breadcrumb__item">
                     <a class="nhsuk-breadcrumb__link trigger-loader"
-                   asp-action="CookiePolicy"
-                   asp-controller="CookieConsent">Cookie Policy</a>
+                   asp-action=@policyActionName
+                   asp-controller=@policyControllerName>Cookie Policy</a>
                 </li>              
                 <li class="nhsuk-breadcrumb__item">Cookie Consent</li>
             </ol>
@@ -32,7 +35,7 @@
                     <li>it's been a year since you last saved your settings</li>
                     <li>we add any new cookies or change the cookies we use</li>
                 </ul>
-                <p>You can also <a href="@Url.Action("CookiePolicy","CookieConsent")">choose which cookies we use</a> at any time.</p>
+                <p>You can also <a href="@Url.Action(policyActionName, policyControllerName)">choose which cookies we use</a> at any time.</p>
             </div>            
         </div>
     </div>

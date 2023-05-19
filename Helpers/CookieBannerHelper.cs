@@ -8,6 +8,7 @@ namespace UK.NHS.CookieBanner.Helpers
             this IResponseCookies cookies,
             string cookieName,
             string value,
+            string domainName,
             DateTime expiry
         )
         {
@@ -16,6 +17,10 @@ namespace UK.NHS.CookieBanner.Helpers
                 value,
                 new CookieOptions
                 {
+                    Domain= domainName,
+                    HttpOnly = true,
+                    Secure = true, // Set to true if using HTTPS
+                    SameSite = SameSiteMode.Strict,
                     Expires = expiry
                 }
             );

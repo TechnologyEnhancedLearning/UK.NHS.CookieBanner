@@ -11,7 +11,7 @@ namespace UK.NHS.CookieBanner.ViewModels
         public HtmlString? CookiePolicyContent { get; }
         public string? ErrorMessage { get; }
         public CookieConsentViewModel()
-        {            
+        {
         }
         public CookieConsentViewModel(string? errorMessage)
         {
@@ -22,7 +22,7 @@ namespace UK.NHS.CookieBanner.ViewModels
             CookiePolicyContent = new HtmlString(cookiePolicyContent.Details);
             PolicyUpdatedDate = cookiePolicyContent.AmendDate;
         }
-       
+
         public string? PolicyUpdatedDate { get; set; }
         public string? PolicyUpdatedDateAsShort
         {
@@ -35,5 +35,9 @@ namespace UK.NHS.CookieBanner.ViewModels
             set => policyUpdatedDateAsShort = value;
         }
         public string? UserConsent { get => userConsent; set => userConsent = value; }
+
+        private string? optionalLayout;
+
+        public string? Layout { get => optionalLayout; set => optionalLayout = value; }       
     }
 }
