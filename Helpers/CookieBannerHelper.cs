@@ -18,9 +18,6 @@ namespace UK.NHS.CookieBanner.Helpers
                 new CookieOptions
                 {
                     Domain= domainName,
-                    HttpOnly = true,
-                    Secure = true, // Set to true if using HTTPS
-                    SameSite = SameSiteMode.Strict,
                     Expires = expiry
                 }
             );

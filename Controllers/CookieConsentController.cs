@@ -17,7 +17,8 @@ namespace UK.NHS.CookieBanner.Controllers
         private readonly ICookiePolicyService? cookiePolicyService;
         private string CookieBannerConsentCookieName = "";
         private int CookieBannerConsentCookieExpiryDays = 0;
-        private string[] CookieBannerDeleteConsentCookieNames;
+        private string[] CookieBannerAnalyticsCookieNamesPrefix;
+        private string AnalyticsCookiesDomainName = "";
 
         public CookieConsentController(IConfiguration configuration, ICookiePolicyService? cookiePolicyService = null)
         {
@@ -25,7 +26,8 @@ namespace UK.NHS.CookieBanner.Controllers
             this.cookiePolicyService = cookiePolicyService;
             CookieBannerConsentCookieName = configuration.GetCookieBannerConsentCookieName();
             CookieBannerConsentCookieExpiryDays = configuration.GetCookieBannerConsentExpiryDays();
-            CookieBannerDeleteConsentCookieNames = configuration.GetCookieBannerDeleteCookieNames();
+            CookieBannerAnalyticsCookieNamesPrefix = configuration.GetCookieBannerDeleteCookieNames();
+            AnalyticsCookiesDomainName = configuration.GetAnalyticsCookiesDomainName();
 
             string cookieBannerCSName = configuration.GetCookiePolicyConnectionStringName();
             if (!string.IsNullOrEmpty(cookieBannerCSName))
@@ -50,6 +52,7 @@ namespace UK.NHS.CookieBanner.Controllers
 
                     if (Request != null)
                     {
+                        string domainName = HttpContext.Request.Host.Host;
                         if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "true"))
                             model.UserConsent = "true";
                         else if (Request.Cookies.HasCookieBannerCookie(CookieBannerConsentCookieName, "false"))
@@ -105,8 +108,6 @@ namespace UK.NHS.CookieBanner.Controllers
             if (Response != null)
             {
                 string domainName = HttpContext.Request.Host.Host;
-                if (domainName.StartsWith("www"))
-                    domainName = domainName.Substring(3);
 
                 if (consent == "true")
                     Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent, domainName,
@@ -116,9 +117,9 @@ namespace UK.NHS.CookieBanner.Controllers
                 {
                     Response.Cookies?.SetCookieBannerCookie(CookieBannerConsentCookieName, consent, domainName,
                         DateTime.UtcNow.AddDays(CookieBannerConsentCookieExpiryDays));
-                    RemoveCookies();
+                    RemoveCookiesDefinedInConfig();
                 }
-            
+
                 TempData["ObtainUserConsentToTrackPriorToPageLoad"] = consent;
 
                 if (setTempDataConsentViaBannerPost) TempData["consentViaBannerPost"] = consent; // Need this tempdata to display the confirmation banner
@@ -126,14 +127,11 @@ namespace UK.NHS.CookieBanner.Controllers
             return Json("OK");
         }
 
-        private void RemoveCookies()
+        private void RemoveCookiesDefinedInConfig()
         {
-            // Get the domain name from the request URL without protocol or "www" prefix
-            string domainName = HttpContext.Request.Host.Host;
-            if (domainName.StartsWith("www"))
-                domainName = domainName.Substring(3);
+            string domainName = GetDomainName();
 
-            foreach (var removeCookieName in CookieBannerDeleteConsentCookieNames)
+            foreach (var removeCookieName in CookieBannerAnalyticsCookieNamesPrefix)
             {
                 // List and delete all cookies from config
                 var cookies = Request.Cookies.Where(c => c.Key.StartsWith(removeCookieName)).ToList();
@@ -142,6 +140,21 @@ namespace UK.NHS.CookieBanner.Controllers
                     Response.Cookies.Delete(cookie.Key, new CookieOptions { Domain = domainName });
                 }
             }
-        }       
+        }
+
+        private string GetDomainName()
+        {
+            // Get the domain name from the request URL without protocol or "www" prefix
+            string domainName = HttpContext.Request.Host.Host;
+            if (!string.IsNullOrEmpty(AnalyticsCookiesDomainName))
+                domainName = AnalyticsCookiesDomainName;
+            else
+            {
+                int dotIndex = domainName.IndexOf(".");
+                domainName = dotIndex >= 0 ? domainName.Substring(dotIndex) : domainName;
+            }
+
+            return domainName;
+        }
     }
 }
