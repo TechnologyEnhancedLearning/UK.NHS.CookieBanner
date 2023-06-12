@@ -1,8 +1,9 @@
 ﻿@using UK.NHS.CookieBanner.ViewModels
 @model CookieConsentViewModel;
 @{
-    var model = Model;    
+    var model = Model;
     TempData["Layout"] = (string.IsNullOrEmpty(model.Layout) ? "_Layout" : model.Layout);
+    model.Layout = TempData["Layout"].ToString();
 
     if (model == null)
     {
@@ -10,6 +11,7 @@
     }
 }
 <form method="post" asp-controller="CookieConsent" asp-action="CookiePolicy">
+    @Html.HiddenFor(model => model.Layout)
     <div class="nhsuk-u-reading-width">
         <p>We'll only use these cookies if you say it's OK. We'll use a cookie to save your settings.</p>
 

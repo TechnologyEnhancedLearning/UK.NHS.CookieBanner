@@ -78,7 +78,7 @@ namespace UK.NHS.CookieBanner.Controllers
             string? consent = model.UserConsent?.ToString();
             if (!string.IsNullOrEmpty(consent))
                 ConfirmCookieConsent(consent);
-
+            TempData["Layout"] = model.Layout;
             return View("CookieConfirmation");
         }
 

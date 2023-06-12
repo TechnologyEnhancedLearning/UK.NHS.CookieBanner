@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - UK.NHS.CookieBanner</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @*<link href="~/lib/cookiebanner/css/nhsuk.css" rel="stylesheet" />*@
     <link rel="stylesheet" href="~/_content/UK.NHS.CookieBanner/lib/cookiebanner/css/nhsuk.css" asp-append-version="true" />
 </head>
 <body>
    
     @RenderSection("NavBreadcrumbs", false)
+    @*<partial name="_CookieConsentPartial" />*@
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
