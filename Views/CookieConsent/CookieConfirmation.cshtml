@@ -20,14 +20,14 @@
                 </ol>
                 <p class="nhsuk-breadcrumb__back">
                     <a class="nhsuk-breadcrumb__link trigger-loader"
-                       asp-action="CookiePolicy"
-                       asp-controller="CookieConsent">Cookie Policy</a>
+                       asp-action=@policyActionName
+                       asp-controller=@policyControllerName>Cookie Policy</a>
                 </p>
             </div>
         </nav>
     }
 </div>
-<div>
+<div class="nhsuk-u-padding-top-3">
     <div class="nhsuk-width-container app-width-container">
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-full">

@@ -4,10 +4,11 @@
     var model = Model;
     TempData["Layout"] = (string.IsNullOrEmpty(model.Layout) ? "_Layout" : model.Layout);
     model.Layout = TempData["Layout"].ToString();
+    model.UserConsent = (string.IsNullOrEmpty(model.UserConsent) ? "false" : model.UserConsent);
 
     if (model == null)
     {
-        model = new CookieConsentViewModel { UserConsent = "" };
+        model = new CookieConsentViewModel { UserConsent = "false" };
     }
 }
 <form method="post" asp-controller="CookieConsent" asp-action="CookiePolicy">
@@ -15,8 +16,10 @@
     <div class="nhsuk-u-reading-width">
         <p>We'll only use these cookies if you say it's OK. We'll use a cookie to save your settings.</p>
 
-        <h3>Tell us if we can use analytics cookies</h3>
-        <fieldset class="nhsuk-fieldset" id="cookie-statistics-form" aria-describedby="cookie-statistics">
+        <fieldset class="nhsuk-fieldset" id="cookie-statistics-form">
+            <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+                <h3 class="nhsuk-fieldset__heading">Tell us if we can use analytics cookies</h3>
+            </legend>
             <div class="nhsuk-radios nhsuk-radios--inline nhsuk-u-margin-bottom-6">
                 <div class="nhsuk-radios__item">
                     <input class="nhsuk-radios__input"
